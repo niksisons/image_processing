@@ -55,172 +55,70 @@
 
 # Функциональные тест-кейсы (18). Шаблон: ID | Title | Priority | Preconditions | Steps | Expected result | Req
 
-1. TC-AUTH-001 | Успешная авторизация в веб-интерфейсе GitLab | Critical
-   Pre: Создан user; доступ к UI.
-   Steps: 1) Открыть /signin 2) Ввести валидные creds 3) Submit
-   Expected: Вход успешен, пользователь видит dashboard.
-   Req: AUTH-01
-
-2. TC-AUTH-002 | Отказ при неверном пароле | High
-   Pre: User существует.
-   Steps: Ввести верный логин и неверный пароль.
-   Expected: Отказ, сообщение об ошибке, блокировки нет.
-   Req: AUTH-01
-
-3. TC-CI-001 | Запуск пайплайна при push в ветку main | Critical
-   Pre: Репозиторий с .gitlab-ci.yml.
-   Steps: Сделать push в main.
-   Expected: Пайплайн запускается, стадии build → test → deploy выполняются.
-   Req: CI-01
-
-4. TC-BUILD-001 | Успешная сборка docker-образа | Critical
-   Pre: Dockerfile корректен, runner настроен.
-   Steps: Запустить stage build.
-   Expected: Образ собран и запушен в реестр, хэш совпадает с артефактом.
-   Req: BUILD-01
-
-5. TC-SCAN-001 | Сканирование образа на уязвимости обнаруживает критическую уязвимость | High
-   Pre: Образ содержит уязвимость (тестовый образ).
-   Steps: Запустить security scan stage.
-   Expected: Сканы показывают уязвимость, пайплайн помечает результат как failed/warning по policy.
-   Req: SEC-01
-
-6. TC-DEPLOY-001 | Деплой в namespace staging | Critical
-   Pre: Helm chart/manifest доступны.
-   Steps: Выполнить stage deploy в staging.
-   Expected: Deployment создан, Pods в Ready state, Service доступен.
-   Req: DEP-01
-
-7. TC-ROLLBACK-001 | Автоматический rollback при failed readiness | High
-   Pre: Деплой настроен с readiness/liveness.
-   Steps: Внедрить баг в образ, деплой.
-   Expected: Health check не проходит, система выполняет rollback на предыдущую версию.
-   Req: DEP-02
-
-8. TC-SMOKE-001 | Smoke проверка после деплоя | High
-   Pre: Деплой завершён.
-   Steps: Выполнить набор smoke-запросов (health, basic API).
-   Expected: Все ответы 200, ответ укладывается в SLA latency.
-   Req: QA-01
-
-9. TC-SERVICE-MESH-001 | Взаимодействие между сервисами через internal service | High
-   Pre: Два микросервиса развернуты.
-   Steps: Сделать запрос к сервису A, который вызывает B.
-   Expected: Корректный ответ, трассировка видна в логах/trace.
-   Req: INT-01
-
-10. TC-SECRET-001 | Доступ к секретам через K8s Secret | Critical
-    Pre: Secret создан.
-    Steps: Деплой приложение, которое читает секрет из env.
-    Expected: Приложение успешно читает значение, секрет не раскрыт в логе.
-    Req: SEC-02
-
-11. TC-NAMESPACES-001 | Изоляция между namespace (RBAC) | High
-    Pre: Два namespace, роль ограничена.
-    Steps: Попытаться получить ресурс из другого namespace с помощью serviceaccount.
-    Expected: Доступ запрещён (403).
-    Req: AUTH-02
-
-12. TC-CANARY-001 | Canary deployment с частичным трафиком | Medium
-    Pre: Canary strategy настроена.
-    Steps: Выполнить canary deploy 10% трафика.
-    Expected: 10% запросов идут к новой ревизии, метрики показывают распределение.
-    Req: DEP-03
-
-13. TC-LOGGING-001 | Логи приложений попадают в централизованную систему | Medium
-    Pre: Promtail/agent настроен.
-    Steps: Выполнить action в приложении, найти запись в Loki/ELK.
-    Expected: Лог найден с корректными метаданными.
-    Req: MON-01
-
-14. TC-METRICS-001 | Экспорт пользовательских метрик в Prometheus | Medium
-    Pre: Экспортер настроен.
-    Steps: Сгенерировать нагрузку, проверить p99/p95 метрики.
-    Expected: Метрики видны в Prometheus, Grafana графики обновляются.
-    Req: MON-02
-
-15. TC-HELM-001 | Применение values override | Medium
-    Pre: Chart поддерживает values.
-    Steps: Применить helm upgrade --values custom.yaml.
-    Expected: Настройки применены, приложение работает с новыми параметрами.
-    Req: OPS-01
-
-16. TC-DB-CONN-001 | Подключение приложения к тестовой БД | Critical
-    Pre: БД доступна, секреты заданы.
-    Steps: Выполнить запрос записи и чтения.
-    Expected: Операции успешны, откат транзакции работает.
-    Req: INT-02
-
-17. TC-CLEANUP-001 | Удаление ресурсов при destroy pipeline | Low
-    Pre: Есть test namespace.
-    Steps: Запустить cleanup stage.
-    Expected: Ресурсы удалены, namespace очищен.
-    Req: OPS-02
-
-18. TC-AUDIT-001 | Аудит действий пользователей (who did what) | High
-    Pre: Audit logging включён.
-    Steps: Выполнить изменение в конфигурации, посмотреть audit logs.
-    Expected: Запись содержит user, timestamp, action, resource.
-    Req: SEC-03
+| ID                  | Title                                                             | Priority | Preconditions                                      | Steps                                                                           | Expected result                                                            | Requirement(s) |
+| ------------------- | ----------------------------------------------------------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------- |
+| TC-AUTH-001         | Успешная авторизация в веб-интерфейсе GitLab                      | Critical | Создан user; доступ к UI                           | 1. Открыть `/signin` <br>2. Ввести валидные учётные данные <br>3. Нажать Submit | Вход успешен; пользователь видит dashboard                                 | AUTH-01        |
+| TC-AUTH-002         | Отказ при неверном пароле                                         | High     | Существующий user                                  | Ввести корректный логин + неверный пароль и Submit                              | Ошибка авторизации, сообщение об ошибке, без блокировки                    | AUTH-01        |
+| TC-CI-001           | Запуск pipeline при push в ветку main                             | Critical | Репозиторий с `.gitlab-ci.yml`, настроенный runner | Сделать push в `main`                                                           | Pipeline запускается, стадии build → test → deploy выполняются             | CI-01          |
+| TC-BUILD-001        | Успешная сборка docker-образа                                     | Critical | Корректный Dockerfile, настроенный runner          | Запустить stage build                                                           | Образ собран, запушен в registry; hash = артефакт                          | BUILD-01       |
+| TC-SCAN-001         | Сканирование образа на уязвимости выявляет критическую уязвимость | High     | Тестовый образ с уязвимостью                       | Запустить security-scan stage                                                   | Скан сообщает об уязвимости; pipeline помечен как failed/warning по policy | SEC-01         |
+| TC-DEPLOY-001       | Деплой в namespace staging                                        | Critical | Helm chart / manifest доступен                     | Вызвать stage deploy для staging                                                | Deployment создан; Pods в Ready; Service доступен                          | DEP-01         |
+| TC-ROLLBACK-001     | Автоматический rollback при failed readiness                      | High     | Деплой настроен с readiness / liveness             | Задеплоить багнутый образ                                                       | Health-check падает; система откатывает на предыдущую стабильную версию    | DEP-02         |
+| TC-SMOKE-001        | Smoke-проверка после деплоя                                       | High     | Деплой завершён                                    | Выполнить набор smoke запросов (health, basic API)                              | Все ответы 200 OK; latency в пределах SLA                                  | QA-01          |
+| TC-SERVICE-MESH-001 | Взаимодействие сервисов через internal service                    | High     | Два микросервиса задеплоены                        | Сделать запрос к сервису A → вызывает B                                         | Корректный ответ; trace / лог содержит вызов B                             | INT-01         |
+| TC-SECRET-001       | Доступ к секретам через K8s Secret                                | Critical | Секрет создан в k8s                                | Деплой приложения, читающего секрет из env                                      | Приложение читает секрет; секрет не раскрыт в логах                        | SEC-02         |
+| TC-NAMESPACES-001   | Изоляция namespace (RBAC)                                         | High     | Два namespace, роль ограничена                     | Попытаться получить ресурс другого namespace через serviceaccount               | Доступ запрещён (HTTP 403 / k8s RBAC error)                                | AUTH-02        |
+| TC-CANARY-001       | Canary-деплой 10% трафика                                         | Medium   | Canary strategy настроена                          | Провести canary deploy, направить 10% трафика                                   | ~10% запросов уходят к новой версии; метрики отражают распределение        | DEP-03         |
+| TC-LOGGING-001      | Логи приложений попадают в централизованную систему               | Medium   | Promtail / agent настроен                          | Сгенерировать лог через приложение; проверить лог в Loki/ELK                    | Лог найден, метаданные корректны (timestamp, service, level)               | MON-01         |
+| TC-METRICS-001      | Экспорт пользовательских метрик в Prometheus                      | Medium   | Экспортер метрик настроен                          | Сгенерировать нагрузку, затем проверить p95/p99 метрики                         | Метрики видны в Prometheus; графики Grafana обновляются                    | MON-02         |
+| TC-HELM-001         | Применение override через `values.yaml`                           | Medium   | Chart поддерживает values override                 | Выполнить `helm upgrade --values custom.yaml`                                   | Параметры применены; приложение работает с новыми настройками              | OPS-01         |
+| TC-DB-CONN-001      | Подключение приложения к тестовой БД                              | Critical | БД доступна; секреты заданы                        | Выполнить запись и чтение через приложение                                      | Операции успешны; транзакция откатывается/коммитится корректно             | INT-02         |
+| TC-CLEANUP-001      | Удаление ресурсов при destroy pipeline                            | Low      | Есть test namespace                                | Запустить cleanup stage                                                         | Ресурсы удалены; namespace очищен                                          | OPS-02         |
+| TC-AUDIT-001        | Аудит действий пользователей (who/when/what)                      | High     | Audit-логирование включено                         | Выполнить изменение конфигурации; просмотреть audit logs                        | Запись есть: user, timestamp, action, resource, details                    | SEC-03         |
 
 # Нефункциональные тест-кейсы (6)
 
-NF-LOAD-001 | Нагрузочное тестирование endpoint-а API | Critical
-Pre: Test environment with scale.
-Steps: Смоделировать ожидаемую и 2x ожидаемой нагрузку 30 минут.
-Expected: p95 latency < SLA; error rate < 1%; нет падений кластера.
+| ID               | Title                                                 | Priority | Preconditions                                    | Steps                                                         | Expected result                                                                 |
+| ---------------- | ----------------------------------------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| NF-LOAD-001      | Нагрузочное тестирование API-endpoint                 | Critical | Test-среда масштабирована                        | Смоделировать нагрузку: обычную + 2× ожидаемую — 30 минут     | p95 latency < SLA; error rate < 1%; кластер не падает                           |
+| NF-STRESS-001    | Стресс-тест + восстановление после пиков              | High     | Система под мониторингом                         | Деградировать нагрузку до отказа → затем снизить              | Система деградирует корректно; данные не теряются; восстановление автоматически |
+| NF-STABILITY-001 | Soak-тест стабильности (24–72 часа)                   | High     | Приложение развернуто, нагрузка = низкий/средний | Запуск теста на 24–72 часа                                    | Нет утечек памяти; error rate < threshold; среднее CPU/память — стабильно       |
+| NF-SEC-001       | Аудит безопасности (SAST + DAST + config scan)        | Critical | Исходники и образы доступны                      | Запустить SAST/DAST + security-scan образа и конфигурации     | Нет критических уязвимостей; если есть — оформлен план mitigation               |
+| NF-USAB-001      | Юзабилити интерфейса CI/CD для оператора              | Medium   | UI CI/CD доступен                                | Оператор: запускает pipeline, вводит vars, просматривает логи | Все операции выполняются в целевое время; навигация без ошибок; UI понятен      |
+| NF-COMPAT-001    | Совместимость с обновлением Kubernetes (upgrade test) | High     | Тест-кластер доступен                            | Обновить minor версию k8s → прогнать deploy + smoke           | Система работает; манифесты совместимы; инструкции обновлены                    |
 
-NF-STRESS-001 | Стрессовое тестирование | High
-Pre: Система под мониторингом.
-Steps: Увеличить нагрузку до отказа, затем снизить.
-Expected: Система дегрейдит корректно, данные не теряются, восстановление происходит автоматически.
-
-NF-STABILITY-001 | Тест на стабильность (soak) | High
-Pre: Приложение под нагрузкой low-level.
-Steps: 24-72 часа при обычной нагрузке.
-Expected: Нет утечек памяти, ошибка < порога, средняя CPU нормальна.
-
-NF-SEC-001 | Аудит безопасности (SAST + DAST + конфигурации) | Critical
-Pre: Код и образы доступны для анализа.
-Steps: Запустить Trivy/Snyk + ZAP/OWASP DAST.
-Expected: Нет критических уязвимостей; для найденных — план mitigation.
-
-NF-USAB-001 | Юзабилити интерфейса CI/CD для оператора | Medium
-Pre: UI доступен.
-Steps: Оператор выполняет набор задач: запустить пайплайн, инпут переменных, просмотреть логи.
-Expected: Время выполнения задач укладывается в целевые значения; ошибки навигации < threshold.
-
-NF-COMPAT-001 | Совместимость с Kubernetes версией (upgrade test) | High
-Pre: Тестовый кластер доступен.
-Steps: Обновить k8s minor version, прогнать deploys и smoke.
-Expected: Система работает, манифесты совместимы, инструкции обновлены.
 
 # Приоритеты и группировка
 
-Группы: Авторизация/Аутентификация, CI/CD pipeline (build/test/deploy), Orchestration (K8s/Helm), Observability (metrics/logs/alerts), Security (secrets/audit/scans), DB/Integrations.
+Тесты сгруппированы по модулям:
 
-# Матрица трассируемости (приведу компактно)
+Авторизация / RBAC — TC-AUTH-001, TC-AUTH-002, TC-NAMESPACES-001
 
-Определим требования (обобщённо):
+CI/CD & build / registry — TC-CI-001, TC-BUILD-001, TC-SCAN-001, TC-HELM-001, NF-SEC-001
 
-* R-AUTH: Аутентификация и RBAC
-* R-CI: Автоматизация CI/CD
-* R-BUILD: Сборка и реестр образов
-* R-DEP: Деплой и откат
-* R-SEC: Безопасность, сканирование, секреты
-* R-MON: Мониторинг и логирование
-* R-PERF: Производительность и стабильность
-* R-OPS: Операционные сценарии (cleanup, upgrade)
+Деплой / оркестрация (Kubernetes / Helm / Canary / rollback) — TC-DEPLOY-001, TC-ROLLBACK-001, TC-CANARY-001, TC-CLEANUP-001, NF-COMPAT-001
 
-Таблица соответствий (Тест → Требование):
+Smoke / интеграция сервисов / DB / secrets / mesh — TC-SMOKE-001, TC-SERVICE-MESH-001, TC-SECRET-001, TC-DB-CONN-001, NF-LOAD/NF-STRESS/NF-STABILITY
 
-* TC-AUTH-001, TC-AUTH-002, TC-NAMESPACES-001 → R-AUTH
-* TC-CI-001, TC-BUILD-001, TC-HELM-001 → R-CI, R-BUILD
-* TC-DEPLOY-001, TC-ROLLBACK-001, TC-CANARY-001 → R-DEP
-* TC-SCAN-001, TC-SECRET-001, TC-AUDIT-001 → R-SEC
-* TC-LOGGING-001, TC-METRICS-001 → R-MON
-* TC-DB-CONN-001, TC-SERVICE-MESH-001 → R-OPS, R-INT
-* NF-LOAD-001, NF-STRESS-001, NF-STABILITY-001 → R-PERF
+Мониторинг / логирование / observability — TC-LOGGING-001, TC-METRICS-001, TC-AUDIT-001
+
+Нефункциональные: performance / stability / security / usability / compatibility — NF-LOAD-001 .. NF-COMPAT-001
+
+# Матрица трассируемости
+
+| Requirement                                                 | Linked Test Cases                                             |
+| ----------------------------------------------------------- | ------------------------------------------------------------- |
+| R-AUTH (авторизация / RBAC)                                 | TC-AUTH-001, TC-AUTH-002, TC-NAMESPACES-001                   |
+| R-CI / R-BUILD (CI/CD, сборка, registry)                    | TC-CI-001, TC-BUILD-001, TC-HELM-001                          |
+| R-SEC (безопасность, сканы, secrets, аудит)                 | TC-SCAN-001, TC-SECRET-001, TC-AUDIT-001, NF-SEC-001          |
+| R-DEP (деплой, rollback, deploy flow)                       | TC-DEPLOY-001, TC-ROLLBACK-001, TC-CANARY-001, TC-CLEANUP-001 |
+| R-MON (мониторинг / логирование / метрики)                  | TC-LOGGING-001, TC-METRICS-001                                |
+| R-INT / R-OPS (интеграция, межсервисное взаимодействие, DB) | TC-SERVICE-MESH-001, TC-DB-CONN-001                           |
+| R-PERF (нагрузка, стабильность)                             | NF-LOAD-001, NF-STRESS-001, NF-STABILITY-001                  |
+| R-USAB (юзабилити, удобство)                                | NF-USAB-001                                                   |
+| R-COMPAT (совместимость, обновления)                        | NF-COMPAT-001                                                 |
+| QA / Smoke (прочие проверки)                                | TC-SMOKE-001                                                  |
+
 
 Выявление требований без покрытия:
 
